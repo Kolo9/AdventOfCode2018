@@ -1,0 +1,1 @@
+z=0;for(i of a) {i=Math.floor(i/3)-2;while(i>0){z+=i; i=Math.floor(i/3)-2}}z

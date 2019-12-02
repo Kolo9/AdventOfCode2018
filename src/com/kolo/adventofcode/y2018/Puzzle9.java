@@ -1,4 +1,4 @@
-package com.kolo.adventofcode;
+package com.kolo.adventofcode.y2018;
 
 import java.util.ArrayList;
 import java.util.HashMap;

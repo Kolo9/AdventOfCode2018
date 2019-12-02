@@ -1,4 +1,4 @@
-package com.kolo.adventofcode;
+package com.kolo.adventofcode.y2018;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.kolo.adventofcode.Puzzle20.Point;
-import com.kolo.adventofcode.Puzzle20.Point3d;
+import com.kolo.adventofcode.y2018.Puzzle20.Point;
+import com.kolo.adventofcode.y2018.Puzzle20.Point3d;
 
 public class Puzzle23 {	
 	

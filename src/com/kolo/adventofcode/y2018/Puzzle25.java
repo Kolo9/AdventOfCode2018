@@ -1,4 +1,4 @@
-package com.kolo.adventofcode;
+package com.kolo.adventofcode.y2018;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.kolo.adventofcode.Puzzle20.Point3d;
+import com.kolo.adventofcode.y2018.Puzzle20.Point3d;
 
 public class Puzzle25 {	
 	  

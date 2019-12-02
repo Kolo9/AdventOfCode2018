@@ -1,13 +1,15 @@
-package com.kolo.adventofcode;
+package com.kolo.adventofcode.y2018;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Puzzle19 {	
+public class Puzzle21 {	
 
 	private static enum Func {
 		ADDR, ADDI, MULR, MULI, BANR, BANI, BORR, BORI, SETR, SETI, GTIR, GTRI, GTRR, EQIR, EQRI, EQRR;
@@ -72,32 +74,24 @@ public class Puzzle19 {
 		}
 		return r;
 	}
+	private static LinkedHashSet<Long> z = new LinkedHashSet<>();
 	public static void main(String[] args) throws Exception {
-		List<String> ss = Files.readAllLines(Paths.get("puzzle19"));
+		List<String> ss = Files.readAllLines(Paths.get("puzzle21"));
 		Pattern ins = Pattern.compile("(.*) (\\d+) (\\d+) (\\d+)");
 		long inst = 0;
-		int instP = 1;
+		int instP = 2;
 		long[] registers = new long[6];
-		registers[0] = 1;
-		
-		//////
-		//4:eqrr 3 4 3
-		//[0, 4, 236, 236, 10551261, 1]
-		//registers = new long[] {0, 4, 10551261, 10551261, 10551261, 2};
-		registers = new long[] {0, 4, 6, 6, 6, 0};
-		inst = 4;
-		//////
-		long z = 0;
+		registers[0] = 0;
+		int tmp = 0;
 		while (inst < ss.size()) {
-			//if (inst == 2) {
-				System.out.println(z);
-				System.out.println(inst + ":" + ss.get((int) inst));
-				System.out.println(Arrays.toString(registers));
-				System.out.println();
-			//}
-			z++;
+			tmp++;
+//				System.out.println(inst + ":" + ss.get((int) inst));
+//				System.out.println(Arrays.toString(registers));
+//				System.out.println();
+			
 //			System.out.println(Arrays.toString(registers));
 //			System.out.println(inst);
+			long[] previous = Arrays.copyOf(registers, registers.length);
 				Matcher insM = ins.matcher(ss.get((int) inst));
 				insM.find();
 				registers = p(Func.valueOf(insM.group(1).toUpperCase()),
@@ -106,7 +100,17 @@ public class Puzzle19 {
 						Long.parseLong(insM.group(3)),
 						Long.parseLong(insM.group(4)));
 				registers[instP]++;
-			
+			if (ss.get((int) inst).equals("eqrr 5 0 1")) {
+				System.out.println(z.size() + " " + tmp + ": " + Arrays.toString(previous) + " changed to " + Arrays.toString(registers) + " via " + ss.get((int) inst));
+				if(!z.add(previous[5])) {
+					System.out.println(z);
+					Iterator<Long> iter = z.iterator();
+					long l = -1;
+					while(iter.hasNext()) l = iter.next();
+					System.out.println(l);
+					System.exit(0);
+				}
+			}
 			inst = registers[instP];
 		}
 		registers[instP]--;

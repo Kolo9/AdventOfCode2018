@@ -1,4 +1,4 @@
-package com.kolo.adventofcode;
+package com.kolo.adventofcode.y2018;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import com.kolo.adventofcode.Puzzle20.Point;
+import com.kolo.adventofcode.y2018.Puzzle20.Point;
 
 public class Puzzle22 {	
 	private static enum Equipment {

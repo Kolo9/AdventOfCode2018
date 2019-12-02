@@ -1,4 +1,4 @@
-package com.kolo.adventofcode;
+package com.kolo.adventofcode.y2018;
 
 import java.nio.file.Paths;
 import java.util.Scanner;

@@ -1,4 +1,4 @@
-package com.kolo.adventofcode;
+package com.kolo.adventofcode.y2018;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +11,7 @@ import java.util.Set;
 
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.Graph;
-import com.kolo.adventofcode.Puzzle20.Point;
+import com.kolo.adventofcode.y2018.Puzzle20.Point;
 
 public class Djikstras {
 private Graph<Point> graph;

@@ -1,4 +1,4 @@
-package com.kolo.adventofcode;
+package com.kolo.adventofcode.y2018;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
-import com.kolo.adventofcode.Puzzle20.Point;
+import com.kolo.adventofcode.y2018.Puzzle20.Point;
 
 public class Puzzle20_different {	
 	
