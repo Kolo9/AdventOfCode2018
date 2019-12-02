@@ -18,8 +18,8 @@ for (noun = 0; noun < 100; noun++) {
 console.log('done');
 
 function exec(a) {
-	for(p=0; p < a.length - 4; p += 4) {
-	  a[a[p+3]] = a[p] == 1 ? a[a[p+1]] + a[a[p+2]] : a[a[p+1]] * a[a[p+2]] 
-	}
-	return a[0]
+  for(p=0; p < a.length - 4; p += 4) {
+    a[a[p+3]] = a[p] == 1 ? a[a[p+1]] + a[a[p+2]] : a[a[p+1]] * a[a[p+2]]
+  }
+  return a[0]
 }
