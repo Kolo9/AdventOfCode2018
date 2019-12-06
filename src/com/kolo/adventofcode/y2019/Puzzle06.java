@@ -14,15 +14,12 @@ final class Puzzle06 {
 
     public static void main(String[] args) throws Exception {
         MutableGraph<String> g = GraphBuilder.directed().build();
-        Set<String> nodes = new HashSet<>();
         String myOrbit = null;
         String santasOrbit = null;
         for (String in : Files.readAllLines(Paths.get(Puzzle03.class.getResource("in06").toURI()))) {
             String[] edge = in.split("\\)");
             g.addNode(edge[0]);
             g.addNode(edge[1]);
-            nodes.add(edge[0]);
-            nodes.add(edge[1]);
             g.putEdge(edge[1], edge[0]);
             if ("SAN".equals(edge[1])) {
                 santasOrbit = edge[0];
@@ -31,7 +28,7 @@ final class Puzzle06 {
             }
         }
         int ans1 = 0;
-        for (String node : nodes) {
+        for (String node : g.nodes()) {
             ans1 += Graphs.reachableNodes(g, node).size() - 1;
         }
         System.out.println(ans1);
