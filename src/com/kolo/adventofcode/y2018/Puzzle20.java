@@ -12,6 +12,7 @@ import java.util.Set;
 
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import com.kolo.adventofcode.common.Djikstras;
 
 public class Puzzle20 {	
 	
@@ -171,7 +172,7 @@ public class Puzzle20 {
 		}
 	}
 	public static void main(String[] args) throws Exception {
-		List<String> ss = Files.readAllLines(Paths.get("puzzle20"));
+		List<String> ss = Files.readAllLines(Paths.get(Puzzle20.class.getResource("puzzle20").toURI()));
 		String z = ss.get(0).substring(1, ss.get(0).length() - 1);
 		MutableGraph<Point> g = GraphBuilder.directed().build();
 		
@@ -191,6 +192,7 @@ public class Puzzle20 {
 			}
 //			System.out.println(s);
 			char c = s.charAt(0);
+			Point point = null;
 			switch (c) {
 				case '(':
 					int paren = 1;
@@ -224,43 +226,35 @@ public class Puzzle20 {
 					}
 					break;
 				case 'N':
-					Point north = new Point(curPoint.x, curPoint.y - 1);
-					g.putEdge(curPoint, north);
-					g.putEdge(north,  curPoint);
-					Parameters p = new Parameters(s.substring(1), north);
-					if (seen.add(p)) stack.add(p);
+					point = new Point(curPoint.x, curPoint.y - 1);
 					break;
 				case 'E':
-					Point east = new Point(curPoint.x + 1, curPoint.y);
-					g.putEdge(curPoint, east);
-					g.putEdge(east, curPoint);
-					p = new Parameters(s.substring(1), east);
-					if (seen.add(p)) stack.add(p);
+					point = new Point(curPoint.x + 1, curPoint.y);
 					break;
 				case 'S':
-					Point south = new Point(curPoint.x, curPoint.y + 1);
-					g.putEdge(curPoint, south);
-					g.putEdge(south, curPoint);
-					p = new Parameters(s.substring(1), south);
-					if (seen.add(p)) stack.add(p);
+					point = new Point(curPoint.x, curPoint.y + 1);
 					break;
 				case 'W':
-					Point west = new Point(curPoint.x - 1, curPoint.y);
-					g.putEdge(curPoint, west);
-					g.putEdge(west, curPoint);
-					p = new Parameters(s.substring(1), west);
-					if (seen.add(p)) stack.add(p);
+					point = new Point(curPoint.x - 1, curPoint.y);
 					break;
 				default:
 				 System.out.println("WTF?");
 				 System.exit(1);
 				 break;
 			}
+            if (point != null) {
+                g.putEdge(curPoint, point);
+                g.putEdge(point, curPoint);
+                Parameters p = new Parameters(s.substring(1), point);
+                if (seen.add(p)) {
+                    stack.add(p);
+                }
+            }
 		}
 		//helper(g, s, new Point(0, 0));
 		System.out.println(g);
 		
-		Djikstras d = new Djikstras(g);
+		Djikstras<Point> d = new Djikstras<Point>(g);
 		d.execute(new Point(0, 0));
 		System.out.println(d.distance.values().stream().mapToInt(Integer::intValue).max().getAsInt());
 		System.out.println(d.distance.values().stream().filter(v -> v >= 1000).count());

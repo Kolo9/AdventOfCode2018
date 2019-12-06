@@ -5,28 +5,37 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Preconditions;
+
 public class IntcodeComputer {
+    
+    private static enum Mode {
+        POSITION, INTERMEDIATE;
+    }
 
     private List<Integer> state;
-    private int pointer;
+    private List<Mode> modes = new LinkedList<>();
+    private int pointer = 0;
+    private Integer input = null;
 
-    public IntcodeComputer(String filePath) {
-        String input;
+    public IntcodeComputer(String filePath, Integer input) {
+        String state;
         try {
-            input = String.join("\n", Files.readAllLines(Paths.get(filePath)));
+            state = String.join("\n", Files.readAllLines(Paths.get(filePath)));
         } catch (IOException e) {
             throw new RuntimeException("Could not open file " + filePath, e);
         }
-        this.state = Arrays.asList(input.split(",")).stream().map(Integer::parseInt).collect(Collectors.toList());
-        this.pointer = 0;
+        this.state = Arrays.asList(state.split(",")).stream().map(Integer::parseInt).collect(Collectors.toList());
+        this.input = input;
     }
 
-    public IntcodeComputer(Integer[] input) {
-        this.state = Arrays.asList(input);
-        this.pointer = 0;
+    public IntcodeComputer(Integer[] state, Integer input) {
+        this.state = Arrays.asList(state);
+        this.input = input;
 
     }
 
@@ -36,14 +45,38 @@ public class IntcodeComputer {
 
     public void run() {
         while (pointer < state.size()) {
-            int op = state.get(pointer++);
-            System.out.println("op " + op + ": " + state.get(0));
+            int val = state.get(pointer++);
+            int op = val % 100;
+            modes.clear();
+            val /= 100;
+            while (val > 0) {
+                modes.add(Mode.values()[val % 10]);
+                val /= 10;
+            }
             switch(op) {
             case 1:
                 add();
                 break;
             case 2:
                 multiply();
+                break;
+            case 3:
+                input();
+                break;
+            case 4:
+                output();
+                break;
+            case 5:
+                jumpIfTrue();
+                break;
+            case 6:
+                jumpIfFalse();
+                break;
+            case 7:
+                lessThan();
+                break;
+            case 8:
+                equals();
                 break;
             case 99:
                 return;
@@ -54,19 +87,73 @@ public class IntcodeComputer {
     }
 
     private void add() {
-        int first = state.get(state.get(pointer++));
-        int second = state.get(state.get(pointer++));
-        int dest = state.get(pointer++);
+        int first = next();
+        int second = next();
+        int dest = nextDest();
         state.set(dest, first + second);
-        System.out.println(dest + " is now " + (first + second));
     }
 
     private void multiply() {
-        int first = state.get(state.get(pointer++));
-        int second = state.get(state.get(pointer++));
-        int dest = state.get(pointer++);
+        int first = next();
+        int second = next();
+        int dest = nextDest();
         state.set(dest, first * second);
-        System.out.println(dest + " is now " + (first * second));
+    }
+
+    private void input() {
+        Preconditions.checkNotNull(input);
+        int dest = nextDest();
+        state.set(dest, input);
+        input = null;
+    }
+
+    private void output() {
+        System.out.println(next());
+    }
+
+    private void jumpIfTrue() {
+        int first = next();
+        int second = next();
+        if (first != 0) {
+            pointer = second;
+        }
+    }
+
+    private void jumpIfFalse() {
+        int first = next();
+        int second = next();
+        if (first == 0) {
+            pointer = second;
+        }
+    }
+
+    private void lessThan() {
+        int first = next();
+        int second = next();
+        int dest = nextDest();
+        state.set(dest, first < second ? 1 : 0);
+    }
+
+    private void equals() {
+        int first = next();
+        int second = next();
+        int dest = nextDest();
+        state.set(dest, first == second ? 1 : 0);
+    }
+
+    private int next() {
+        Mode mode = Mode.POSITION;
+        if (!modes.isEmpty()) {
+            mode = modes.remove(0);
+        }
+        if (mode == Mode.POSITION) {
+            return state.get(state.get(pointer++));
+        }
+        return state.get(pointer++);
+    }
+
+    private int nextDest() {
+        return state.get(pointer++);
     }
 }
 
