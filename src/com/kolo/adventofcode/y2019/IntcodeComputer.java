@@ -20,9 +20,11 @@ public class IntcodeComputer {
     private List<Integer> state;
     private List<Mode> modes = new LinkedList<>();
     private int pointer = 0;
-    private Integer input = null;
+    private List<Integer> input = new ArrayList<>();
+    private List<Integer> output = new ArrayList<>();
+    private boolean done = false;
 
-    public IntcodeComputer(String filePath, Integer input) {
+    public IntcodeComputer(String filePath) {
         String state;
         try {
             state = String.join("\n", Files.readAllLines(Paths.get(filePath)));
@@ -30,20 +32,32 @@ public class IntcodeComputer {
             throw new RuntimeException("Could not open file " + filePath, e);
         }
         this.state = Arrays.asList(state.split(",")).stream().map(Integer::parseInt).collect(Collectors.toList());
-        this.input = input;
+        this.input = new ArrayList<>(input);
     }
 
-    public IntcodeComputer(Integer[] state, Integer input) {
-        this.state = Arrays.asList(state);
-        this.input = input;
-
+    public IntcodeComputer(Integer[] state) {
+        this.state = new ArrayList<>(Arrays.asList(state));
     }
 
     public List<Integer> getState() {
         return new ArrayList<>(state);
     }
 
-    public void run() {
+    public IntcodeComputer addInput(Integer i) {
+        this.input.add(i);
+        return this;
+    }
+
+    public IntcodeComputer addInput(List<Integer> i) {
+        this.input.addAll(i);
+        return this;
+    }
+
+    public boolean done() {
+        return done;
+    }
+
+    public boolean run() {
         while (pointer < state.size()) {
             int val = state.get(pointer++);
             int op = val % 100;
@@ -61,7 +75,9 @@ public class IntcodeComputer {
                 multiply();
                 break;
             case 3:
-                input();
+                if (!input()) {
+                    return false;
+                }
                 break;
             case 4:
                 output();
@@ -79,11 +95,14 @@ public class IntcodeComputer {
                 equals();
                 break;
             case 99:
-                return;
+                done = true;
+                return true;
             default:
                 throw new UnsupportedOperationException("Unknown opcode " + op);
             }
         }
+
+        throw new IllegalStateException("pointer out of bounds: " + pointer);
     }
 
     private void add() {
@@ -100,15 +119,27 @@ public class IntcodeComputer {
         state.set(dest, first * second);
     }
 
-    private void input() {
-        Preconditions.checkNotNull(input);
+    private boolean input() {
+        if (input.isEmpty()) {
+            pointer--;
+            return false;
+        }
         int dest = nextDest();
-        state.set(dest, input);
-        input = null;
+        state.set(dest, input.remove(0));
+        return true;
     }
 
     private void output() {
-        System.out.println(next());
+        this.output.add(next());
+    }
+
+    public int getOutput(int index) {
+        Preconditions.checkArgument(index < output.size());
+        return output.get(0);
+    }
+
+    public int getLastOutput() {
+        return output.get(output.size() - 1);
     }
 
     private void jumpIfTrue() {
