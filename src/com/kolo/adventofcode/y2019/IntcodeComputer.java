@@ -1,55 +1,84 @@
 package com.kolo.adventofcode.y2019;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 
 public class IntcodeComputer {
     
     private static enum Mode {
-        POSITION, INTERMEDIATE;
+        POSITION, IMMEDIATE, RELATIVE;
     }
 
-    private List<Integer> state;
+    private static final class Memory extends ArrayList<BigInteger> {
+        @Override
+        public BigInteger get(int index) {
+            grow(index);
+            return super.get(index);
+        }
+
+        @Override
+        public BigInteger set(int index, BigInteger element) {
+            grow(index);
+            return super.set(index, element);
+        }
+
+        private void grow(int index) {
+            while (index >= size()) {
+                // TODO: Use a map if necessary due to sparseness.
+                add(BigInteger.ZERO);
+            }
+        }
+    }
+
+    private Memory state = new Memory();
     private List<Mode> modes = new LinkedList<>();
     private int pointer = 0;
-    private List<Integer> input = new ArrayList<>();
-    private List<Integer> output = new ArrayList<>();
+    private List<BigInteger> input = new ArrayList<>();
+    private List<BigInteger> output = new ArrayList<>();
+    private int relativeBase = 0;
     private boolean done = false;
 
     public IntcodeComputer(String filePath) {
         String state;
         try {
-            state = String.join("\n", Files.readAllLines(Paths.get(filePath)));
-        } catch (IOException e) {
+            state = String.join("\n", Files.readAllLines(Paths.get(IntcodeComputer.class.getResource(filePath).toURI())));
+        } catch (IOException|URISyntaxException e) {
             throw new RuntimeException("Could not open file " + filePath, e);
         }
-        this.state = Arrays.asList(state.split(",")).stream().map(Integer::parseInt).collect(Collectors.toList());
+        Arrays.stream(state.split(",")).map(i -> new BigInteger(i)).forEach(this.state::add);
         this.input = new ArrayList<>(input);
     }
 
     public IntcodeComputer(Integer[] state) {
-        this.state = new ArrayList<>(Arrays.asList(state));
+        Arrays.stream(state).map(BigInteger::valueOf).forEach(this.state::add);
     }
 
-    public List<Integer> getState() {
+    public List<BigInteger> getState() {
         return new ArrayList<>(state);
     }
 
-    public IntcodeComputer addInput(Integer i) {
+    public IntcodeComputer addInput(BigInteger i) {
         this.input.add(i);
         return this;
     }
 
+    public IntcodeComputer addInput(Integer i) {
+        addInput(BigInteger.valueOf(i));
+        return this;
+    }
+
     public IntcodeComputer addInput(List<Integer> i) {
-        this.input.addAll(i);
+        i.forEach(this::addInput);
         return this;
     }
 
@@ -59,7 +88,7 @@ public class IntcodeComputer {
 
     public boolean run() {
         while (pointer < state.size()) {
-            int val = state.get(pointer++);
+            int val = state.get(pointer++).intValueExact();
             int op = val % 100;
             modes.clear();
             val /= 100;
@@ -94,6 +123,9 @@ public class IntcodeComputer {
             case 8:
                 equals();
                 break;
+            case 9:
+                adjustRelativeBase();
+                break;
             case 99:
                 done = true;
                 return true;
@@ -106,17 +138,17 @@ public class IntcodeComputer {
     }
 
     private void add() {
-        int first = next();
-        int second = next();
+        BigInteger first = next();
+        BigInteger second = next();
         int dest = nextDest();
-        state.set(dest, first + second);
+        state.set(dest, first.add(second));
     }
 
     private void multiply() {
-        int first = next();
-        int second = next();
+        BigInteger first = next();
+        BigInteger second = next();
         int dest = nextDest();
-        state.set(dest, first * second);
+        state.set(dest, first.multiply(second));
     }
 
     private boolean input() {
@@ -125,7 +157,9 @@ public class IntcodeComputer {
             return false;
         }
         int dest = nextDest();
-        state.set(dest, input.remove(0));
+        BigInteger val = input.get(0);
+
+        state.set(dest, val);
         return true;
     }
 
@@ -133,58 +167,87 @@ public class IntcodeComputer {
         this.output.add(next());
     }
 
-    public int getOutput(int index) {
+    public BigInteger getOutput(int index) {
         Preconditions.checkArgument(index < output.size());
         return output.get(0);
     }
 
-    public int getLastOutput() {
+    public BigInteger getLastOutput() {
+        Preconditions.checkState(!output.isEmpty());
         return output.get(output.size() - 1);
+    }
+    
+    public List<BigInteger> getOutputList() {
+        return new ArrayList<>(output);
     }
 
     private void jumpIfTrue() {
-        int first = next();
-        int second = next();
-        if (first != 0) {
-            pointer = second;
+        BigInteger first = next();
+        BigInteger second = next();
+        if (first.compareTo(BigInteger.ZERO) != 0) {
+            pointer = second.intValueExact();
         }
     }
 
     private void jumpIfFalse() {
-        int first = next();
-        int second = next();
-        if (first == 0) {
-            pointer = second;
+        BigInteger first = next();
+        BigInteger second = next();
+        if (first.compareTo(BigInteger.ZERO) == 0) {
+            pointer = second.intValueExact();
         }
     }
 
     private void lessThan() {
-        int first = next();
-        int second = next();
+        BigInteger first = next();
+        BigInteger second = next();
         int dest = nextDest();
-        state.set(dest, first < second ? 1 : 0);
+        state.set(dest, first.compareTo(second) == -1 ? BigInteger.ONE : BigInteger.ZERO);
     }
 
     private void equals() {
-        int first = next();
-        int second = next();
+        BigInteger first = next();
+        BigInteger second = next();
         int dest = nextDest();
-        state.set(dest, first == second ? 1 : 0);
+        state.set(dest, first.compareTo(second) == 0 ? BigInteger.ONE : BigInteger.ZERO);
     }
 
-    private int next() {
+    private void adjustRelativeBase() {
+        int adjustment = next().intValueExact();
+        relativeBase += adjustment;
+    }
+
+    private BigInteger next() {
         Mode mode = Mode.POSITION;
         if (!modes.isEmpty()) {
             mode = modes.remove(0);
         }
-        if (mode == Mode.POSITION) {
-            return state.get(state.get(pointer++));
+        BigInteger val = state.get(pointer++);
+        switch (mode) {
+            case POSITION:
+                return state.get(val.intValueExact());
+            case IMMEDIATE:
+                return val;
+            case RELATIVE:
+                return state.get(relativeBase + val.intValueExact());
+            default:
+                throw new IllegalStateException("Unimplemented mode " + mode);
         }
-        return state.get(pointer++);
     }
 
     private int nextDest() {
-        return state.get(pointer++);
+        Mode mode = Iterables.getOnlyElement(modes, Mode.POSITION);
+        int dest = 0;
+        switch (mode) {
+            case RELATIVE:
+                dest = relativeBase;
+            case POSITION:
+                dest += state.get(pointer++).intValueExact();
+                break;
+            default:
+                throw new IllegalStateException("Unimplemented mode " + mode);
+        }
+
+        return dest;
     }
 }
 
