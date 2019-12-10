@@ -19,23 +19,13 @@ final class Puzzle10 {
             this.c = c;
         }
 
-        double slope(Cell other) {
-            if (other.x == x) {
-                if (other.y > y) {
-                    return 99999999;
-                }
-                return -99999999;
-            }
-            return (other.y - y) / (double)(other.x - x); 
-        }
-
         double angle(Cell other) {
             return Math.atan2(other.y - y, other.x - x) * 180 / (2 * Math.PI);            
         }
 
         @Override
         public String toString() {
-            return String.format("(%d, %d)", x, y);
+            return "" + c;
         }
     }
 
@@ -66,10 +56,7 @@ final class Puzzle10 {
                     if (a1.distanceSq(a3) > a1.distanceSq(a2)) {
                         continue;
                     }
-                    if (a1.slope(a3) != a1.slope(a2)) {
-                        continue;
-                    }
-                    if (((a1.x - a3.x > 0) != (a1.x - a2.x > 0)) || ((a1.y - a3.y > 0) != (a1.y - a2.y > 0))) {
+                    if (a1.angle(a3) != a1.angle(a2)) {
                         continue;
                     }
                     visible = false;
@@ -83,12 +70,12 @@ final class Puzzle10 {
         }
         print(belt);
 
-        int part1 = asteroids.stream().mapToInt(a -> a.numVisible).max().getAsInt();
-        System.out.println(part1);
+        int mostVisible = asteroids.stream().mapToInt(a -> a.numVisible).max().getAsInt();
+        System.out.println("Part 1: " + mostVisible);
                
      
         // Part 2.
-        Cell station = asteroids.stream().filter(a -> a.numVisible == part1).findFirst().get();
+        Cell station = asteroids.stream().filter(a -> a.numVisible == mostVisible).findFirst().get();
         asteroids.removeIf(a -> a == station);
         LinkedListMultimap<Double, Cell> asteroidAngles = LinkedListMultimap.create();
         asteroids.sort((a1, a2) -> (int) (station.distanceSq(a1) - station.distanceSq(a2)));
@@ -114,7 +101,7 @@ final class Puzzle10 {
             angleIndex++;
             angleIndex %= orderedAngles.size();
         }
-        System.out.println(lastDestroyed);
+        System.out.println("Part 2: " + (lastDestroyed.x * 100 + lastDestroyed.y));
     }
 
     private static void print(Cell[][] belt) {
