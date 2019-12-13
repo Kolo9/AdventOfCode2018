@@ -67,6 +67,14 @@ public class IntcodeComputer {
         return new ArrayList<>(state);
     }
 
+    public void setState(int index, int val) {
+        setState(index, BigInteger.valueOf(val));
+    }
+
+    public void setState(int index, BigInteger val) {
+        state.set(index, val);
+    }
+
     public IntcodeComputer addInput(BigInteger i) {
         this.input.add(i);
         return this;
@@ -87,6 +95,9 @@ public class IntcodeComputer {
     }
 
     public boolean run() {
+        if (done) {
+            return true;
+        }
         while (pointer < state.size()) {
             int val = state.get(pointer++).intValueExact();
             int op = val % 100;
@@ -157,7 +168,7 @@ public class IntcodeComputer {
             return false;
         }
         int dest = nextDest();
-        BigInteger val = input.get(0);
+        BigInteger val = input.remove(0);
 
         state.set(dest, val);
         return true;
@@ -169,7 +180,7 @@ public class IntcodeComputer {
 
     public BigInteger getOutput(int index) {
         Preconditions.checkArgument(index < output.size());
-        return output.get(0);
+        return output.get(index);
     }
 
     public BigInteger getLastOutput() {
