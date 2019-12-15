@@ -4,36 +4,12 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.kolo.adventofcode.common.Direction;
+
 final class Puzzle11 {
 
     private static final int BLACK = 0;
-    private static final int WHITE = 1;    
-    private static enum Direction {
-        NORTH(0, -1), EAST(1, 0), SOUTH(0, 1), WEST(-1, 0);
-        
-        int dx;
-        int dy;
-        Direction(int dx, int dy) {
-            this.dx = dx;
-            this.dy = dy;
-        }
-
-        Direction cw() {
-            int i = ordinal() + 1;
-            i %= Direction.values().length;
-            return Direction.values()[i];
-        }
-
-        Direction ccw() {
-            int i = ordinal() + 3;
-            i %= Direction.values().length;
-            return Direction.values()[i];
-        }
-
-        Point apply(Point p) {
-            return new Point(p.x + dx, p.y + dy);
-        }
-    }
+    private static final int WHITE = 1;
     private static class PaintingRobot {
         Point pos = new Point(0, 0);
         Direction direction = Direction.NORTH;

@@ -183,6 +183,10 @@ public class IntcodeComputer {
         return output.get(index);
     }
 
+    public boolean hasOutput() {
+        return !output.isEmpty();
+    }
+
     public BigInteger getLastOutput() {
         Preconditions.checkState(!output.isEmpty());
         return output.get(output.size() - 1);
