@@ -32,6 +32,9 @@ class Puzzle01 {
 
     private static List<Integer> findTwoSum(Set<Integer> input, int sum, Set<Integer> toIgnore) {
         for (int i : input) {
+            if (toIgnore.contains(i)) {
+                continue;
+            }
             int j = sum - i;
             if (i == j) {
                 continue;
