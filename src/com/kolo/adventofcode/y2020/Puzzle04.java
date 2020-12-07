@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 class Puzzle04 {
     public static void main(String[] args) throws Exception {
-        String[] passports = new String(Files.readAllBytes(Paths.get(Puzzle03.class.getResource("in04").toURI())))
+        String[] passports = new String(Files.readAllBytes(Paths.get(Puzzle04.class.getResource("in04").toURI())))
                 .split("\\s*\\n\\s*\\n\\s*");
         int validPassportCountPart1 = 0;
         int validPassportCountPart2 = 0;

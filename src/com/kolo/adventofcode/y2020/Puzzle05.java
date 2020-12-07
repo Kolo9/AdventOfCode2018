@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 class Puzzle05 {
     public static void main(String[] args) throws Exception {
-        List<String> lines = Files.readAllLines(Paths.get(Puzzle03.class.getResource("in05").toURI()));
+        List<String> lines = Files.readAllLines(Paths.get(Puzzle05.class.getResource("in05").toURI()));
         Set<Integer> seats = lines.stream().map(Puzzle05::parseSeat).collect(Collectors.toSet());
         int minSeat = Collections.min(seats);
         int maxSeat = Collections.max(seats);

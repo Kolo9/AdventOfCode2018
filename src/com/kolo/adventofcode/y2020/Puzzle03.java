@@ -6,7 +6,7 @@ import java.util.List;
 
 class Puzzle03 {
     public static void main(String[] args) throws Exception {
-        List<String> input = Files.readAllLines(Paths.get(Puzzle04.class.getResource("in03").toURI()));
+        List<String> input = Files.readAllLines(Paths.get(Puzzle03.class.getResource("in03").toURI()));
         int height = input.size();
         int width = input.get(0).length();
         boolean treeGrid[][] = new boolean[height][width];
