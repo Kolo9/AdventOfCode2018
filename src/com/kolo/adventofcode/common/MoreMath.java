@@ -1,7 +1,6 @@
 package com.kolo.adventofcode.common;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 public final class MoreMath {
 
@@ -15,12 +14,12 @@ public final class MoreMath {
         return (a.multiply(b)).divide(gcd(a, b));
     }
 
-    public static BigInteger lcm(BigInteger... n) {
-        if (n.length == 2) {
-            return lcm(n[0], n[1]);
+    public static BigInteger lcm(BigInteger a, BigInteger b, BigInteger... n) {
+        BigInteger lcm = lcm(a, b);
+        for (int i = 0; i < n.length; i++) {
+            lcm = lcm(lcm, n[i]);
         }
-        
-        return lcm(n[0], lcm(Arrays.copyOfRange(n, 1, n.length)));
+        return lcm;
     }
 
     public static BigInteger gcd(int a, int b) {
@@ -31,11 +30,11 @@ public final class MoreMath {
         return lcm(BigInteger.valueOf(a), BigInteger.valueOf(b));
     }
 
-    public static BigInteger lcm(int... n) {
+    public static BigInteger lcm(int a, int b, int... n) {
         BigInteger[] nBigInt = new BigInteger[n.length];
         for (int i = 0; i < n.length; i++) {
             nBigInt[i] = BigInteger.valueOf(n[i]);
         }
-        return lcm(nBigInt);
+        return lcm(BigInteger.valueOf(a), BigInteger.valueOf(b), nBigInt);
     }
 }
