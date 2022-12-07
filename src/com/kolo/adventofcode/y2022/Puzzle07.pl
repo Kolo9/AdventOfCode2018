@@ -12,7 +12,6 @@ for(<F>) {
 			} else {
 				push@cur, $1;
 			}
-			$c = 'cd';
 		}
 	} else {
 		$d = \%root;
